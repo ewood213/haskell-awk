@@ -1,0 +1,46 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           haskell-awk
+version:        0.1.0.0
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    LICENSE
+
+library
+  exposed-modules:
+      Interpret
+      Lexer
+      Parser
+  other-modules:
+      Paths_haskell_awk
+  hs-source-dirs:
+      src
+  default-extensions:
+      OverloadedStrings
+  build-tools:
+      alex
+    , happy
+  build-depends:
+      array
+    , base
+    , bytestring
+  default-language: Haskell2010
+
+executable awk
+  main-is: app/Main.hs
+  other-modules:
+      Paths_haskell_awk
+  default-extensions:
+      OverloadedStrings
+  build-depends:
+      base
+    , bytestring
+    , haskell-awk
+  default-language: Haskell2010
