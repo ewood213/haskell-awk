@@ -8,7 +8,7 @@ import qualified Data.ByteString.Lazy.Char8 as BS
 interpret :: Exp1 -> ByteString -> ByteString
 interpret (Exp1 pattern action) bs = do
     if buildPattern pattern bs
-    then buildAction action bs
+    then buildPrintAction action bs
     else BS.empty
 
 buildPattern :: Pattern -> ByteString -> Bool
@@ -28,9 +28,15 @@ binOpToFn Le = (<=)
 binOpToFn Gt = (>)
 binOpToFn Ge = (>=)
 
-buildAction :: Action -> ByteString -> ByteString
-buildAction (Action []) bs = bs
-buildAction (Action cs) bs = BS.unwords $ map (flip evalColvar bs) cs
+buildPrintAction :: PrintAction -> ByteString -> ByteString
+buildPrintAction (PrintAction []) bs = bs
+buildPrintAction (PrintAction cs) bs = BS.unwords $ map (flip evalVar bs) cs
+
+evalVar :: Var -> ByteString -> ByteString
+evalVar (StringVar s) _ = s
+evalVar (IntVar i) _ = BS.pack $ show i
+evalVar (Colvar 0) s = s
+evalVar (Colvar c) s = BS.words s !! (c - 1)
 
 evalColvar :: Token -> ByteString -> ByteString
 evalColvar (TokenColvar 0) s = s

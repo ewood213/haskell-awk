@@ -12,12 +12,13 @@ import Data.Function
 $digit = [0-9]
 
 @colvar = \$$digit+
-
+@string = \"(\\.|[^\"])*\"
 tokens :-
 
 <0> $white+ ;
 <0> @colvar { tokColvar }
 <0> $digit+ { tokDigit }
+<0> @string { tokString }
 <0> print   { \_ _-> pure TokenPrint }
 <0> ==      { \_ _ -> pure TokenEq }
 <0> \{      { \_ _ -> pure TokenLBrace }
@@ -28,7 +29,6 @@ tokens :-
 <0> "!="    { \_ _ -> pure TokenNe }
 <0> ">="    { \_ _ -> pure TokenGe }
 <0> "<="    { \_ _ -> pure TokenLe }
-
 {
 
 data Token = TokenColvar Int -- This will be changed to bytestring eventually to support variable names
@@ -44,6 +44,7 @@ data Token = TokenColvar Int -- This will be changed to bytestring eventually to
            | TokenNe
            | TokenGe
            | TokenLe
+           | TokenString ByteString
            deriving (Eq, Show)
 
 alexEOF :: Alex Token
@@ -63,6 +64,14 @@ tokDigit (_, _, str, _) len =
     & BS.take len
     & readDigit
     & TokenDigit
+    & pure
+
+tokString :: AlexAction Token
+tokString (_, _, str, _) len =
+    BS.take len str
+    & BS.unpack
+    & read  -- interpret escape sequences
+    & TokenString . fromString  -- convert back to ByteString
     & pure
 
 readDigit :: ByteString -> Int

@@ -16,6 +16,7 @@ import qualified Data.ByteString.Lazy.Char8 as BS
       colvar          { TokenColvar $$ }
       digit           { TokenDigit $$ }
       print           { TokenPrint }
+      string          { TokenString $$ }
       '=='            { TokenEq }
       '<'             { TokenLt }
       '>'             { TokenGt }
@@ -47,21 +48,27 @@ binop : '==' { Eq }
       | '<=' { Le }
 
 action
-      : print colvarList          { Action $2 }
-      | print                     { Action [] }
+      : print varList             { PrintAction $2 }
 
-colvarList
-      : colvar ',' colvarList     { TokenColvar $1 : $3 }
-      | colvar                    { [TokenColvar $1] }
+varList
+      : var ',' varList     { $1 : $3 }
+      | var                    { [$1] }
+      |                          { [] }
+
+var
+      : colvar                { Colvar $1 }
+      | string                { StringVar $1 }
+      | digit                 { IntVar $1 }
 
 
 {
 data Exp1
-      = Exp1 Pattern Action
+      = Exp1 Pattern PrintAction
       deriving Show
 
+data Var = StringVar ByteString | IntVar Int | Colvar Int deriving Show
 data Pattern = Pattern Token BinaryOp Token | Empty deriving Show
-data Action = Action [Token] deriving Show
+data PrintAction = PrintAction [Var] deriving Show
 
 data BinaryOp = Eq | Lt | Gt | Le | Ge | Ne deriving Show
 
