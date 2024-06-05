@@ -58,6 +58,9 @@ testColvarBinop = hspec $ do
     it "IntLtTrue" $ do
       runSystem "0 < 1 { print $1 }" testAwkData
         `shouldBe` Right ["Beth", "Kathy", "Mark", "Dan", "Mary", "Susie"]
+    it "ColvarEqString" $ do
+      runSystem "$1 == \"Beth\" { print $1 }" testAwkData
+        `shouldBe` Right ["Beth", BS.empty, BS.empty, BS.empty, BS.empty, BS.empty]
 
 testPrint :: IO ()
 testPrint = hspec $ do
@@ -72,6 +75,9 @@ testPrint = hspec $ do
       runSystem "{ print $0, $1 }" testAwkData
         `shouldBe` Right ["Beth 4.00 0 Beth", "Kathy 4.00 10 Kathy", "Mark 5.00 20 Mark",
                           "Dan 3.75 0 Dan", "Mary 5.50 22 Mary", "Susie 4.25 18 Susie"]
+    it "PrintInt" $ do
+      runSystem "{ print 1, 5 }" testAwkData
+        `shouldBe` Right ["1 5", "1 5", "1 5", "1 5", "1 5", "1 5"]
     it "printEmpty" $ do
       runSystem "{ print }" testAwkData
         `shouldBe` Right (BS.lines testAwkData)
@@ -100,7 +106,7 @@ testStringPrinting = hspec $ do
       runSystem "$3 == 0 { print \"Hello\", $1 }" testAwkData
         `shouldBe` Right ["Hello Beth", BS.empty, BS.empty, "Hello Dan", BS.empty, BS.empty]
     it "StringPrintEscapedQuotes" $ do
-      runSystem "{ print \"Hello \\\"World\\\"\" }" testAwkData
+      runSystem "{ print \"Hello\", \"\\\"World\\\"\" }" testAwkData
         `shouldBe` Right ["Hello \"World\"", "Hello \"World\"", "Hello \"World\"",
                           "Hello \"World\"", "Hello \"World\"", "Hello \"World\""]
     it "StringPrintEscapedNewline" $ do
