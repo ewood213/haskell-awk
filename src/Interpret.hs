@@ -32,13 +32,14 @@ buildPrintAction (PrintAction cs) bs = BS.unwords $ map (valueToString . flip ev
 evalVar :: Var -> ByteString -> Value
 evalVar (StringVar s) _ = ValString s
 evalVar (IntVar i) _ = ValInt i
-evalVar (Colvar 0) s = ValString s
 evalVar (Colvar c) s =
     case BS.readInt colvarVal of
         Just (i, "") -> ValInt i
         otherwise -> ValString colvarVal
     where
-        colvarVal = BS.words s !! (c - 1)
+        colvarVal = evalColvar c
+        evalColvar 0 = s
+        evalColvar c = BS.words s !! (c - 1)
 
 valueToString :: Value -> ByteString
 valueToString (ValString s) = s

@@ -61,6 +61,9 @@ testColvarBinop = hspec $ do
     it "ColvarEqString" $ do
       runSystem "$1 == \"Beth\" { print $1 }" testAwkData
         `shouldBe` Right ["Beth", BS.empty, BS.empty, BS.empty, BS.empty, BS.empty]
+    it "TestColvar0" $ do
+      runSystem "$0 > 1 { print $0 }" "0\n1\n2\n3\n4"
+        `shouldBe` Right ["", "", "2", "3", "4"]
 
 testPrint :: IO ()
 testPrint = hspec $ do
