@@ -10,9 +10,8 @@ import Data.Function
 %wrapper "monad-bytestring"
 
 $digit = [0-9]
-$alpha = [a-zA-Z]
 
-@colvar = \$[1-9]$digit*
+@colvar = \$$digit+
 
 tokens :-
 
@@ -26,9 +25,9 @@ tokens :-
 <0> \,      { \_ _ -> pure TokenComma }
 <0> \<      { \_ _ -> pure TokenLt }
 <0> \>      { \_ _ -> pure TokenGt }
-<0> "!="      { \_ _ -> pure TokenNe }
-<0> ">="      { \_ _ -> pure TokenGe }
-<0> "<="      { \_ _ -> pure TokenLe }
+<0> "!="    { \_ _ -> pure TokenNe }
+<0> ">="    { \_ _ -> pure TokenGe }
+<0> "<="    { \_ _ -> pure TokenLe }
 
 {
 
@@ -70,13 +69,4 @@ readDigit :: ByteString -> Int
 readDigit bs = case BS.readInt bs of
     Just (n, _) -> n
     otherwise -> error "readDigit: not a digit"
-
-scanMany :: ByteString -> Either String [Token]
-scanMany input = runAlex input go
-  where
-    go = do
-      output <- alexMonadScan
-      if output == TokenEOF
-        then pure [output]
-        else (output :) <$> go
 }

@@ -25,3 +25,13 @@ executables:
     - base
     - bytestring
     - haskell-awk
+
+tests:
+  haskell-aw-tests:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+    - base
+    - haskell-awk
+    - hspec
+    - bytestring

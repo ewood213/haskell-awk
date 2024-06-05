@@ -12,6 +12,7 @@ main = do
         [] -> putStrLn "Please give script file"
         [x] -> putStrLn "Please give input file"
         (x:y:xs) -> awkMain x y
+
 awkMain :: String -> String -> IO ()
 awkMain x y = do
     script <- BS.readFile x
@@ -21,4 +22,4 @@ awkMain x y = do
         Right exp1 -> do
             let lineFn = interpret exp1
             input <- BS.readFile y
-            mapM_ lineFn $ BS.lines input
+            BS.putStrLn $ BS.unlines $ map lineFn $ BS.lines input

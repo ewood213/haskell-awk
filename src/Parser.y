@@ -29,9 +29,12 @@ import qualified Data.ByteString.Lazy.Char8 as BS
 %%
 
 Exp   : pattern '{' action '}' { Exp1 $1 $3 }
-
+      | '{' action '}'          { Exp1 Empty $2 }
 pattern
-      : colvar binop digit     { Pattern (TokenColvar $1) $2 (TokenDigit $3) }
+      : valtoken binop valtoken     { Pattern $1 $2 $3 }
+
+valtoken : colvar                { TokenColvar $1 }
+           | digit               { TokenDigit $1 }
 
 binop : '==' { Eq }
       | '<'  { Lt }
@@ -42,6 +45,7 @@ binop : '==' { Eq }
 
 action
       : print colvarList          { Action $2 }
+      | print                     { Action [] }
 
 colvarList
       : colvar ',' colvarList     { TokenColvar $1 : $3 }
@@ -53,7 +57,7 @@ data Exp1
       = Exp1 Pattern Action
       deriving Show
 
-data Pattern = Pattern Token BinaryOp Token deriving Show
+data Pattern = Pattern Token BinaryOp Token | Empty deriving Show
 data Action = Action [Token] deriving Show
 
 data BinaryOp = Eq | Lt | Gt | Le | Ge | Ne deriving Show
