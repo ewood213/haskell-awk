@@ -22,4 +22,4 @@ awkMain x y = do
         Right exps -> do
             let lineFn = map interpret exps
             input <- BS.readFile y
-            BS.putStr $ BS.unlines [ f lines | f <- lineFn, lines <- BS.lines input]
+            BS.putStr $ BS.unlines [f lines | lines <- BS.lines input, f <- lineFn]

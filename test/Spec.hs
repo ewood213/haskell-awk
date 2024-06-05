@@ -18,7 +18,7 @@ runSystem :: ByteString -> ByteString -> Either String [ByteString]
 runSystem script input = do
   parsed <- parse script
   let linefns = map interpret parsed
-  return [ f lines | f <- linefns, lines <- BS.lines input]
+  return [ f lines | lines <- BS.lines input, f <- linefns]
 
 main :: IO ()
 main = do
@@ -95,11 +95,11 @@ testMultipleExp = hspec $ do
   describe "test2Exp" $ do
     it "2Exp" $ do
       runSystem "$3 == 0 { print $1 } $3 == 10 { print $2 }" testAwkData
-        `shouldBe` Right ["Beth", BS.empty, BS.empty, "Dan", BS.empty, BS.empty,
-                          BS.empty, "4.00", BS.empty, BS.empty, BS.empty, BS.empty]
+        `shouldBe` Right ["Beth", BS.empty, BS.empty, "4.00", BS.empty, BS.empty,
+                          "Dan", BS.empty, BS.empty, BS.empty, BS.empty, BS.empty]
     it "3Exp" $ do
       runSystem "{ print } { print } { print }" testAwkData
-        `shouldBe` Right (BS.lines testAwkData ++ BS.lines testAwkData ++ BS.lines testAwkData)
+        `shouldBe` (Right $ concatMap (\(a, b, c) -> [a, b, c]) $ zip3 (BS.lines testAwkData) (BS.lines testAwkData) (BS.lines testAwkData))
     it "0Exp" $ do
       runSystem "" testAwkData
         `shouldBe` Right []
