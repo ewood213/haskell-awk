@@ -38,8 +38,11 @@ evalVar (Colvar c) s =
         otherwise -> ValString colvarVal
     where
         colvarVal = evalColvar c
+        w = BS.words s
         evalColvar 0 = s
-        evalColvar c = BS.words s !! (c - 1)
+        evalColvar c = if length w >= c
+            then w !! (c - 1)
+            else BS.empty
 
 valueToString :: Value -> ByteString
 valueToString (ValString s) = s

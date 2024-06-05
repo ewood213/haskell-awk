@@ -64,6 +64,12 @@ testColvarBinop = hspec $ do
     it "TestColvar0" $ do
       runSystem "$0 > 1 { print $0 }" "0\n1\n2\n3\n4"
         `shouldBe` Right ["", "", "2", "3", "4"]
+    it "TestColvarOutOfBounds" $ do
+      runSystem "$5 == 0 { print $1 }" testAwkData
+        `shouldBe` Right [BS.empty, BS.empty, BS.empty, BS.empty, BS.empty, BS.empty]
+    it "TestColvarOutOfBoundsVal" $ do
+      runSystem "$5 == \"\" { print }" testAwkData
+        `shouldBe` Right (BS.lines testAwkData)
 
 testPrint :: IO ()
 testPrint = hspec $ do
