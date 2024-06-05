@@ -27,7 +27,6 @@ main = do
   testMultipleExp
   testStringPrinting
 
--- Eventually half of these should be flipped. i.e. $3 == 0 should be 0 == $3
 testColvarBinop :: IO ()
 testColvarBinop = hspec $ do
   describe "testColvarBinop" $ do
