@@ -28,8 +28,11 @@ import qualified Data.ByteString.Lazy.Char8 as BS
 
 %%
 
-Exp   : pattern '{' action '}' { Exp1 $1 $3 }
-      | '{' action '}'          { Exp1 Empty $2 }
+Exps : SingleExp Exps                { $1 : $2 }
+      |                              { [] }
+
+SingleExp   : pattern '{' action '}' { Exp1 $1 $3 }
+      | '{' action '}'               { Exp1 Empty $2 }
 pattern
       : valtoken binop valtoken     { Pattern $1 $2 $3 }
 
@@ -70,6 +73,6 @@ parseError _ = do
 lexer :: (Token -> Alex a) -> Alex a
 lexer = (alexMonadScan >>=)
 
-parse :: ByteString -> Either String Exp1
+parse :: ByteString -> Either String [Exp1]
 parse s = runAlex s calc
 }

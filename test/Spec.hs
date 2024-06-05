@@ -17,12 +17,14 @@ testAwkData = "Beth 4.00 0\n\
 runSystem :: ByteString -> ByteString -> Either String [ByteString]
 runSystem script input = do
   parsed <- parse script
-  return $ map (interpret parsed) $ BS.lines input
+  let linefns = map interpret parsed
+  return [ f lines | f <- linefns, lines <- BS.lines input]
 
 main :: IO ()
 main = do
   testColvarBinop
   testPrint
+  testMultipleExp
 
 -- Eventually half of these should be flipped. i.e. $3 == 0 should be 0 == $3
 testColvarBinop :: IO ()
@@ -72,3 +74,17 @@ testPrint = hspec $ do
     it "printEmpty" $ do
       runSystem ("{ print }") testAwkData
         `shouldBe` Right (BS.lines testAwkData)
+
+testMultipleExp :: IO ()
+testMultipleExp = hspec $ do
+  describe "test2Exp" $ do
+    it "2Exp" $ do
+      runSystem ("$3 == 0 { print $1 } $3 == 10 { print $2 }") testAwkData
+        `shouldBe` Right ["Beth", BS.empty, BS.empty, "Dan", BS.empty, BS.empty,
+                          BS.empty, "4.00", BS.empty, BS.empty, BS.empty, BS.empty]
+    it "3Exp" $ do
+      runSystem ("{ print } { print } { print }") testAwkData
+        `shouldBe` Right (BS.lines testAwkData ++ BS.lines testAwkData ++ BS.lines testAwkData)
+    it "0Exp" $ do
+      runSystem ("") testAwkData
+        `shouldBe` Right []

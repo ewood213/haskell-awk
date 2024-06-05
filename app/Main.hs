@@ -19,7 +19,7 @@ awkMain x y = do
     let parsed = parse script
     case parsed of
         Left err -> print err
-        Right exp1 -> do
-            let lineFn = interpret exp1
+        Right exps -> do
+            let lineFn = map interpret exps
             input <- BS.readFile y
-            BS.putStrLn $ BS.unlines $ map lineFn $ BS.lines input
+            BS.putStr $ BS.unlines [ f lines | f <- lineFn, lines <- BS.lines input]
