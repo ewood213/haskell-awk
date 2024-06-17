@@ -1,25 +1,24 @@
+{-# LANGUAGE OverloadedStrings #-}
+module Main (main) where
+
+import Runner
 import Parser
-import Lexer
-import Interpret
-import System.Environment (getArgs)
+import qualified Value
+import System.Environment
 import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
+import Control.Monad.State
+import Control.Monad.Except
+import qualified Data.Map as Map
+import Data.Foldable
 
 main :: IO ()
 main = do
-    args <- getArgs
-    case args of
-        [] -> putStrLn "Please give script file"
-        [x] -> putStrLn "Please give input file"
-        (x:y:xs) -> awkMain x y
+    [prog, file] <- getArgs
+    case parse $ BS.pack prog of
+        Left s -> putStrLn s
+        Right p -> do
+            contents <- BS.readFile file
+            BS.putStr $ runProgram p contents
+             
 
-awkMain :: String -> String -> IO ()
-awkMain x y = do
-    script <- BS.readFile x
-    let parsed = parse script
-    case parsed of
-        Left err -> print err
-        Right exps -> do
-            let lineFn = map interpret exps
-            input <- BS.readFile y
-            BS.putStr $ BS.unlines [f lines | lines <- BS.lines input, f <- lineFn]
